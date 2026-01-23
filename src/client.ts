@@ -1,8 +1,8 @@
-import { OpenRouter } from "@openrouter/sdk";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
-const client = new OpenRouter({
+const hackclub = createOpenRouter({
     apiKey: process.env.HACKCLUB_API_KEY,
-    serverURL: process.env.HACKCLUB_URL,
+    baseURL: "https://ai.hackclub.com/proxy/v1",
 });
 
-export default client
+export default hackclub

@@ -1,16 +1,6 @@
-import { OpenRouter } from "@openrouter/sdk";
-import client from "./src/client";
+import { prompt, generateMasterPrompt } from "./src/onboard/initialization";
 
+const intent = await prompt();
 
-const response = await client.chat.send({
-    model: "qwen/qwen3-32b",
-    messages: [
-        {
-            role: "user",
-            content: "Tell me a joke",
-        }
-    ],
-    stream: false,
-});
-
-console.log(response.choices[0]?.message.content);
+const response = await generateMasterPrompt(intent);
+console.log(response);
