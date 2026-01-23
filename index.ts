@@ -1,9 +1,6 @@
 import { OpenRouter } from "@openrouter/sdk";
+import client from "./src/client";
 
-const client = new OpenRouter({
-    apiKey: process.env.HACKCLUB_API_KEY,
-    serverURL: process.env.HACKCLUB_URL,
-});
 
 const response = await client.chat.send({
     model: "qwen/qwen3-32b",
