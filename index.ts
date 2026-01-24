@@ -1,19 +1,38 @@
-import { OpenRouter } from "@openrouter/sdk";
+import type { OpenRouterProvider } from "@openrouter/ai-sdk-provider";
+import { createHackclubClient } from "./src/client";
+import {
+  promptForApiKey,
+  prompt,
+  generateMasterPrompt,
+  inferMasterPrompt,
+  testApiKey,
+} from "./src/onboard/initialization";
 
-const client = new OpenRouter({
-    apiKey: process.env.HACKCLUB_API_KEY,
-    serverURL: process.env.HACKCLUB_URL,
-});
+// Get apikey from haclub user
+const apiKey = await promptForApiKey();
 
-const response = await client.chat.send({
-    model: "qwen/qwen3-32b",
-    messages: [
-        {
-            role: "user",
-            content: "Tell me a joke",
-        }
-    ],
-    stream: false,
-});
+const hackclubClient = createHackclubClient(apiKey);
+const isValidKey = await testApiKey(apiKey, hackclubClient);
 
-console.log(response.choices[0]?.message.content);
+if (!isValidKey) throw new Error("There was an error with your api key");
+
+console.log("Your Key is valid. Welcome to Tempering");
+
+// Getting intent
+async function runSession(client: OpenRouterProvider) {
+  const intent = await prompt();
+
+  const response = await generateMasterPrompt(intent, client);
+  console.log("Creating master prompt");
+  console.log(response + "\n\n");
+
+  if (typeof response === "string") {
+    console.log("Infering from master prompt");
+    const inference = await inferMasterPrompt(response, client);
+    console.log(inference);
+  } else {
+    console.error("Response is undefined or not a string.");
+  }
+}
+
+await runSession(hackclubClient);

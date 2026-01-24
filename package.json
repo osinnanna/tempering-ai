@@ -2,6 +2,9 @@
   "name": "gcompanion",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "build": "bun build index.ts --compile --outfile dist/tempering-ai"
+    },
   "private": true,
   "devDependencies": {
     "@types/bun": "latest"
@@ -10,6 +13,8 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@openrouter/sdk": "^0.4.0"
+    "@openrouter/ai-sdk-provider": "^2.0.0",
+    "@openrouter/sdk": "^0.4.0",
+    "ai": "^6.0.48"
   }
 }
