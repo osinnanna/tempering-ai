@@ -1,0 +1,96 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build binary (Windows)
+        if: runner.os == 'Windows'
+        run: bun build index.ts --compile --outfile tempering-ai-windows-latest.exe
+
+      - name: Build binary (macOS)
+        if: runner.os == 'macOS'
+        run: bun build index.ts --compile --outfile tempering-ai-macos-latest
+
+      - name: Build binary (Linux)
+        if: runner.os == 'Linux'
+        run: bun build index.ts --compile --outfile tempering-ai-ubuntu-latest
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tempering-ai-${{ runner.os }}
+          path: |
+            tempering-ai-*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Linux binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/tempering-ai-Linux/tempering-ai-ubuntu-latest
+          asset_name: tempering-ai-linux
+          asset_content_type: application/octet-stream
+
+      - name: Upload Windows binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/tempering-ai-Windows/tempering-ai-windows-latest.exe
+          asset_name: tempering-ai-windows.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./artifacts/tempering-ai-macOS/tempering-ai-macos-latest
+          asset_name: tempering-ai-macos
+          asset_content_type: application/octet-stream

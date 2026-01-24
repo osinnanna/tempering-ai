@@ -22,12 +22,21 @@ jobs:
             - name: Install dependencies
               run: bun install
 
-            - name: Build binary
-              run: bun build index.ts --compile --outfile dist/tempering-ai
+            - name: Build binary (Windows)
+              if: runner.os == 'Windows'
+              run: bun build index.ts --compile --outfile tempering-ai-windows-latest.exe
+
+            - name: Build binary (macOS)
+              if: runner.os == 'macOS'
+              run: bun build index.ts --compile --outfile tempering-ai-macos-latest
+
+            - name: Build binary (Linux)
+              if: runner.os == 'Linux'
+              run: bun build index.ts --compile --outfile tempering-ai-ubuntu-latest
 
             - name: Upload artifact
               uses: actions/upload-artifact@v4
               with:
                 name: tempering-ai-${{ runner.os }}
-                path: dist/tempering-ai
-            
+                path: |
+                  tempering-ai-*
