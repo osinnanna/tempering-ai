@@ -1,14 +1,17 @@
 import type { OpenRouterProvider } from "@openrouter/ai-sdk-provider";
 import { generateText } from "ai";
 import { createHackclubClient } from "../client";
+import readlineSync from "readline-sync";
 
-export async function promptForApiKey(): Promise<string> {
-    process.stdout.write("Enter your Hackclub API key\nYou can get it from https://ai.hackclub.com/dashboard: ");
-    for await (const line of console) {
-        if (line.trim().length > 0) return line.trim()
-            process.stdout.write("Enter your Hackclub API key: ")
+export function promptForApiKey(): string {
+    const apiKey = readlineSync.question(
+        "Enter your Hackclub API key (get one at https://ai.hackclub.com/dashboard): ",
+        { hideEchoBack: true }
+    );
+    if (!apiKey || apiKey.trim().length === 0) {
+        throw new Error("No API Key Provided");
     }
-    throw new Error("No API Key Provided")
+    return apiKey.trim();
 }
 
 export async function testApiKey(apiKey: string, client: OpenRouterProvider): Promise<boolean> {

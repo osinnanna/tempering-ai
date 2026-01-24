@@ -9,7 +9,7 @@ import {
 } from "./src/onboard/initialization";
 
 // Get apikey from haclub user
-const apiKey = await promptForApiKey();
+const apiKey = promptForApiKey();
 
 const hackclubClient = createHackclubClient(apiKey);
 const isValidKey = await testApiKey(apiKey, hackclubClient);
