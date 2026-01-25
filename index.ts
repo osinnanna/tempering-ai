@@ -2,14 +2,14 @@ import type { OpenRouterProvider } from "@openrouter/ai-sdk-provider";
 import { createHackclubClient } from "./src/client";
 import {
   promptForApiKey,
-  prompt,
+  getUserIntent,
   generateMasterPrompt,
   inferMasterPrompt,
   testApiKey,
 } from "./src/onboard/initialization";
 
 // Get apikey from haclub user
-const apiKey = promptForApiKey();
+const apiKey = await promptForApiKey();
 
 const hackclubClient = createHackclubClient(apiKey);
 const isValidKey = await testApiKey(apiKey, hackclubClient);
@@ -20,7 +20,7 @@ console.log("Your Key is valid. Welcome to Tempering");
 
 // Getting intent
 async function runSession(client: OpenRouterProvider) {
-  const intent = await prompt();
+  const intent = await getUserIntent();
 
   const response = await generateMasterPrompt(intent, client);
   console.log("Creating master prompt");

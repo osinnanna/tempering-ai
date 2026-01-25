@@ -1,19 +1,19 @@
 import type { OpenRouterProvider } from "@openrouter/ai-sdk-provider";
 import { generateText } from "ai";
 import { createHackclubClient } from "../client";
-import readlineSync from "readline-sync";
+import { password, input } from "@inquirer/prompts";
 
-export function promptForApiKey(): string {
-    const apiKey = readlineSync.question(
-        "Enter your Hackclub API key (get one at https://ai.hackclub.com/dashboard): ",
-        { hideEchoBack: true }
-    );
+export async function promptForApiKey(): Promise<string> {
+    const apiKey = await password({
+        message: "Enter your Hackclub API key (get one at https://ai.hackclub.com):",
+        mask: "*",
+    });
+
     if (!apiKey || apiKey.trim().length === 0) {
         throw new Error("No API Key Provided");
     }
     return apiKey.trim();
 }
-
 export async function testApiKey(apiKey: string, client: OpenRouterProvider): Promise<boolean> {
     try {
         const hackclub = createHackclubClient(apiKey);
@@ -28,17 +28,14 @@ export async function testApiKey(apiKey: string, client: OpenRouterProvider): Pr
     }
 }
 
-export async function prompt(): Promise<string | null> {
-    const prompt = "Describe clearly what you would want from the AI-Agent in this session: ";
-    process.stdout.write(prompt);
+export async function getUserIntent(): Promise<string> {
+const response = await input({
+    message: "Describe clearly what you would want from the AI-Agent in this session:",
+    validate: (value) => value.trim().length > 0 || "Please enter your intent"
+});
 
-    for await (const line of console) {
-        console.log(`You typed: ${line}`);
-        if (line.length > 0) return line;
-        process.stdout.write(prompt);
-        return null;
-    }
-    return null;
+console.log(`You typed: ${response}`);
+return response.trim();
 }
 
 export async function generateMasterPrompt(userIntent: string | null, client: OpenRouterProvider) {
