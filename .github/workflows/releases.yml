@@ -15,7 +15,15 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
 
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ubuntu:20.04' || null }}
+
     steps:
+      - name: Install System Deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y curl unzip git
+
       - uses: actions/checkout@v4
 
       - name: Install Bun
@@ -34,7 +42,10 @@ jobs:
 
       - name: Build binary (Linux)
         if: runner.os == 'Linux'
-        run: bun build index.ts --compile --outfile tempering-ai-ubuntu-latest
+        run: |
+          bun build index.ts --compile --outfile tempering-ai-linux
+          # Compress to preserve permissions
+          tar -czvf tempering-ai-linux.tar.gz tempering-ai-linux
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -71,9 +82,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./artifacts/tempering-ai-Linux/tempering-ai-ubuntu-latest
-          asset_name: tempering-ai-linux
-          asset_content_type: application/octet-stream
+          asset_path: ./artifacts/tempering-ai-Linux/tempering-ai-linux.tar.gz
+          asset_name: tempering-ai-linux.tar.gz
+          asset_content_type: application/gzip
 
       - name: Upload Windows binary
         uses: actions/upload-release-asset@v1

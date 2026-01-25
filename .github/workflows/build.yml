@@ -1,42 +1,52 @@
 name: Build Binaries
 
 on:
-    push:
-        branches: [main]
-    pull_request:
-        branches: [main]
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-    build:
-        strategy:
-            matrix:
-                os: [ubuntu-latest, windows-latest, macos-latest]
-        runs-on: ${{ matrix.os }}
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
 
-        steps:
-            - uses: actions/checkout@v4
+    # Use the container ONLY for Linux to get the old GLIBC compatibility
+    container: ${{ matrix.os == 'ubuntu-latest' && 'ubuntu:20.04' || null }}
 
-            - name: Install Bun
-              uses: oven-sh/setup-bun@v1
+    steps:
+      # 1. Install tools needed inside the empty container
+      - name: Install System Deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y curl unzip git
 
-            - name: Install dependencies
-              run: bun install
+      - uses: actions/checkout@v4
 
-            - name: Build binary (Windows)
-              if: runner.os == 'Windows'
-              run: bun build index.ts --compile --outfile tempering-ai-windows-latest.exe
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
 
-            - name: Build binary (macOS)
-              if: runner.os == 'macOS'
-              run: bun build index.ts --compile --outfile tempering-ai-macos-latest
+      - name: Install dependencies
+        run: bun install
 
-            - name: Build binary (Linux)
-              if: runner.os == 'Linux'
-              run: bun build index.ts --compile --outfile tempering-ai-ubuntu-latest
+      - name: Build binary (Windows)
+        if: runner.os == 'Windows'
+        run: bun build index.ts --compile --outfile tempering-ai-windows-latest.exe
 
-            - name: Upload artifact
-              uses: actions/upload-artifact@v4
-              with:
-                name: tempering-ai-${{ runner.os }}
-                path: |
-                  tempering-ai-*
+      - name: Build binary (macOS)
+        if: runner.os == 'macOS'
+        run: bun build index.ts --compile --outfile tempering-ai-macos-latest
+
+      - name: Build binary (Linux)
+        if: runner.os == 'Linux'
+        run: bun build index.ts --compile --outfile tempering-ai-linux
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tempering-ai-${{ runner.os }}
+          path: |
+            tempering-ai-*
