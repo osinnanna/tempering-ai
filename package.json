@@ -1,11 +1,30 @@
 {
-  "name": "gcompanion",
+  "name": "tempering-ai",
+  "version": "0.1.2",
+  "description": "An interactive AI prompt generator for your terminal.",
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "bun build index.ts --compile --outfile dist/tempering-ai"
+    "build": "bun build index.ts --target node --outfile dist/tempering-ai.js",
+    "build:native": "bun build index.ts --compile --outfile dist/tempering-ai"
   },
-  "private": true,
+  "bin": {
+    "tempering-ai": "./dist/tempering-ai.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/osinnanna/tempering-ai.git"
+  },
+  "keywords": [
+    "ai",
+    "cli",
+    "companion",
+    "terminal"
+  ],
   "devDependencies": {
     "@types/bun": "latest",
     "@types/readline-sync": "^1.4.8"
