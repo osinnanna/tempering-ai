@@ -12,7 +12,7 @@ import {
 const apiKey = await promptForApiKey();
 
 const hackclubClient = createHackclubClient(apiKey);
-const isValidKey = await testApiKey(apiKey, hackclubClient);
+const isValidKey = await testApiKey(hackclubClient);
 
 if (!isValidKey) throw new Error("There was an error with your api key");
 
