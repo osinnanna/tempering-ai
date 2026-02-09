@@ -1,11 +1,11 @@
 {
   "name": "tempering-ai",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "An interactive AI prompt generator for your terminal.",
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "bun build index.ts --target node --outfile dist/tempering-ai.js",
+    "build": "bun build index.ts --target node --outfile dist/tempering-ai.js --banner '#!/usr/bin/env node'",
     "build:native": "bun build index.ts --compile --outfile dist/tempering-ai"
   },
   "bin": {
