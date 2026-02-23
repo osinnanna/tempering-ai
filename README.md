@@ -4,7 +4,7 @@
 
 ## Features
 
-*   **Interactive AI Conversations**: Engage with an AI model directly from your command line.
+*   **Quick Context Aware Prompt**: Generate your own prompts directly from your command line.
 *   **Cross-Platform**: Binaries available for Linux, macOS, and Windows in the [GitHub Releases](https://github.com/osinnanna/tempering-ai/releases).
 *   **Easy Installation**: Installable as a global NPM package.
 *   **Fast and Efficient**: Built with Bun for a speedy development and runtime experience.
