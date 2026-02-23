@@ -29,11 +29,11 @@ export async function testApiKey(client: OpenRouterProvider): Promise<boolean> {
 
 export async function getUserIntent(): Promise<string> {
 const response = await input({
-    message: "Describe clearly what you would want from the AI-Agent in this session:",
+    message: "Describe clearly what you would want from the AI-Agent:",
     validate: (value) => value.trim().length > 0 || "Please enter your intent"
 });
 
-console.log(`You typed: ${response}`);
+console.log(`\nYou typed: ${response}`);
 return response.trim();
 }
 
